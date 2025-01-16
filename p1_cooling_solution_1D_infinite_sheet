@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jan 14 23:03:09 2025
+
+@author: lopezama
+"""
+
+## This project calculates key parameters for Problem 1 of Magmas and Eruptions
+
+import numpy as np
+from scipy.special import erfcinv
+
+def calculate_cooling_time(T0, T_inf, T_target, alpha, x):
+    """
+    Calculate the time required for basaltic magma to cool to a target temperature.
+    
+    Parameters:
+    - T0: Initial temperature (°C)
+    - T_inf: Ambient temperature (°C)
+    - T_target: Target temperature (°C)
+    - alpha: Thermal diffusivity (m^2/s)
+    - x: Distance from the surface (m)
+    
+    Returns:
+    - t: Cooling time (seconds)
+    """
+    # Calculate the cooling fraction (eta)
+    eta = (T_target - T_inf) / (T0 - T_inf)
+    
+    # Ensure the cooling fraction is valid
+    if not (0 < eta < 1):
+        raise ValueError("The target temperature must be between the ambient and initial temperatures.")
+    
+    # Use the inverse complementary error function to calculate time
+    erfc_inv = erfcinv(eta)
+    t = (x**2) / (4 * alpha * erfc_inv**2)
+    
+    return t
+
+# Define parameters for basaltic magma
+T0 = 1100        # Initial temperature (°C)
+T_inf = 25       # Ambient temperature (°C)
+T_target = 750   # Target temperature (°C)
+alpha = 1e-6   # Thermal diffusivity (m^2/s)
+x = 10         # Distance from the surface (m)
+
+# Calculate cooling time
+try:
+    cooling_time = calculate_cooling_time(T0, T_inf, T_target, alpha, x)
+    cooling_time_hours = cooling_time / 3600  # Convert to hours
+    
+    print(f"Cooling time: {cooling_time:.2f} seconds ({cooling_time_hours:.2f} hours)")
+except ValueError as e:
+    print(f"Error: {e}") 
+
